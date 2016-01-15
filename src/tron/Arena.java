@@ -45,14 +45,13 @@ class Arena extends Environment {
 
     @Override
     public void timerTaskHandler() {
-
         if (bike1 != null) {
             bike1.move();
         }
         if (bike2 != null) {
             bike2.move();
         }
-//        checkCollisions();
+        checkCollisions();
     }
 
     @Override
@@ -108,48 +107,29 @@ class Arena extends Environment {
 
     public void checkCollisions() {
         if ((bike1 != null) && (bike2 != null)) {
-            if (!bike1.getTrail().contains(bike1.getHead())) {
-//                JOptionPane.showMessageDialog(null, "bike 1 crashed into itself. RIP");
+            if (bike1.selfHit()) {
+                JOptionPane.showMessageDialog(null, "bike 1 crashed into itself. RIP");
+               // System.out.println("bike 1 self hit....");
                 AudioPlayer.play("/tron/crash.wav");
             }
-            if (!bike2.getTrail().contains(bike2.getHead())) {
-//               JOptionPane.showMessageDialog(null, "bike 2 crashed into itself. RIP");
-                AudioPlayer.play("/tron/crash.wav");
-            }
-            if (!bike2.getBikeAndTrail().contains(bike1.getHead())) {
-//                JOptionPane.showMessageDialog(null, "bike 1 crashed into bike 2. RIP");
-                AudioPlayer.play("/tron/crash.wav");
-            }
-            if (!bike1.getBikeAndTrail().contains(bike2.getHead())) {
-//                JOptionPane.showMessageDialog(null, "bike 2 crashed into bike 1. RIP");
+            if (bike2.selfHit()) {
+               JOptionPane.showMessageDialog(null, "bike 2 crashed into itself. RIP");
+                //System.out.println("bike 2 self hit....");
                 AudioPlayer.play("/tron/crash.wav");
             }
 
-//            //check if "bike1" hit itself!!!
-//        if (!bike1.getTrail().contains(bike1.getHead()) {
-//              //do something here..
-//            }
-//
-//            //check if "bike2" hit itself!!!
-//            ​else if (bike2.getTrail().contains(bike2.getHead()) {
-//                System.out.println("Bike 2 crashed into itself - ouch!!!");
-//                //do something here...
-//            }
-//
-//            //check if "bike1" hit "bike2"!!!
-//            ​if (!bike2.getBikeAndTrail().contains(bike1.getHead())) {
-//            
-//                System.out.println("Bike 1 crashed into Bike 2 - ouch!!!");
-//                //do something here...
-//            }
-//
-//
-//            //check if "bike2" hit "bike1"!!!
-//            ​if (bike1.getBikeAndTrail().contains(bike2.getHead()) {
-//                System.out.println("Bike 1 crashed into Bike 2 - ouch!!!");
-//                
-//            }
-        }
+            if (bike2.hasBeenHit(bike1.getHead())) {
+                JOptionPane.showMessageDialog(null, "bike 1 crashed into bike 2. RIP");
+                //System.out.println("bike 2 has been hit...");
+                AudioPlayer.play("/tron/crash.wav");
+            }
+           if (!bike1.hasBeenHit(bike2.getHead())) {
+                JOptionPane.showMessageDialog(null, "bike 2 crashed into bike 1. RIP");
+               AudioPlayer.play("/tron/crash.wav");
+           }
+
+
 
     }
-}
+    }
+    }

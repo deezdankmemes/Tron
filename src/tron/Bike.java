@@ -59,8 +59,17 @@ public class Bike {
 
     public Point getHead() {
         return body.get(HEAD_POSITION);
-
     }
+    
+    public boolean selfHit(){
+        return getTrail().contains(getHead());
+    }
+
+    public boolean hasBeenHit(Point location){
+        return body.contains(location);
+    }
+    
+    
    //<editor-fold defaultstate="collapsed" desc="properties">
 
     private Direction direction = Direction.LEFT;
@@ -107,7 +116,6 @@ public class Bike {
         ArrayList<Point> trail = new ArrayList<>();
         for (int i = 1; i < body.size(); i++) {
             trail.add(body.get(i));
-
         }
         return trail;
     }
