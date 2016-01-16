@@ -27,31 +27,48 @@ class Arena extends Environment {
     private Grid grid;
     private Bike bike1;
     private Bike bike2;
+    private GameState state = GameState.STOPPED;
+    int counter;
 
     public Arena() {
         this.setBackground(ResourceTools.loadImageFromResource("tron/SZdhPUH.jpg").getScaledInstance(1000, 750, Image.SCALE_SMOOTH));
 
         grid = new Grid(145, 145, 5, 5, new Point(30, 30), new Color(0, 0, 250));
 
-        bike1 = new Bike(Direction.RIGHT, new Point(22, 22), Color.GREEN, grid);
-        bike2 = new Bike(Direction.DOWN, new Point(44, 44), Color.RED, grid);
+//        bike1 = new Bike(Direction.RIGHT, new Point(22, 22), Color.GREEN, grid);
+//        bike2 = new Bike(Direction.DOWN, new Point(44, 44), Color.RED, grid);
+        resetGame();
+    }
 
+    private void resetGame() {
+        // remove tail on the bikes
+        // put the bikes in a new start position
+        
+        
+        bike1 = new Bike(Direction.LEFT, new Point(128, 50), Color.GREEN, grid);
+        bike2 = new Bike(Direction.RIGHT, new Point(18, 50), Color.RED, grid);
+         
+        // set the gamestate to STOPPED
+        state = GameState.STOPPED;
+         
+// play a cool
     }
 
     @Override
     public void initializeEnvironment() {
     }
-    int counter;
 
     @Override
     public void timerTaskHandler() {
-        if (bike1 != null) {
-            bike1.move();
+        if (state == GameState.RUNNING) {
+            if (bike1 != null) {
+                bike1.move();
+            }
+            if (bike2 != null) {
+                bike2.move();
+            }
+            checkCollisions();
         }
-        if (bike2 != null) {
-            bike2.move();
-        }
-        checkCollisions();
     }
 
     @Override
@@ -77,7 +94,11 @@ class Arena extends Environment {
         } else if (e.getKeyCode() == KeyEvent.VK_S) {
             bike2.setDirection(Direction.DOWN);
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            AudioPlayer.play("/tron/crash.wav");
+            if (state == GameState.RUNNING) {
+                state = GameState.STOPPED;
+            } else {
+                state = GameState.RUNNING;
+            }
         }
 
     }
@@ -99,7 +120,7 @@ class Arena extends Environment {
         if (bike1 != null) {
             bike1.draw(graphics);
         }
-        
+
         if (bike2 != null) {
             bike2.draw(graphics);
         }
@@ -108,28 +129,36 @@ class Arena extends Environment {
     public void checkCollisions() {
         if ((bike1 != null) && (bike2 != null)) {
             if (bike1.selfHit()) {
+                state = GameState.STOPPED;
                 JOptionPane.showMessageDialog(null, "bike 1 crashed into itself. RIP");
-               // System.out.println("bike 1 self hit....");
-                AudioPlayer.play("/tron/crash.wav");
+                // System.out.println("bike 1 self hit....");
+                AudioPlayer.play("/tron/crashsound.mp3");
+                resetGame();
             }
             if (bike2.selfHit()) {
-               JOptionPane.showMessageDialog(null, "bike 2 crashed into itself. RIP");
+                JOptionPane.showMessageDialog(null, "bike 2 crashed into itself. RIP");
                 //System.out.println("bike 2 self hit....");
-                AudioPlayer.play("/tron/crash.wav");
+                AudioPlayer.play("/tron/crashsound.mp3");
+                resetGame();
             }
 
             if (bike2.hasBeenHit(bike1.getHead())) {
                 JOptionPane.showMessageDialog(null, "bike 1 crashed into bike 2. RIP");
                 //System.out.println("bike 2 has been hit...");
-                AudioPlayer.play("/tron/crash.wav");
+                AudioPlayer.play("/tron/crashsound.mp3");
+                resetGame();
             }
-           if (!bike1.hasBeenHit(bike2.getHead())) {
+
+            if (bike1.hasBeenHit(bike2.getHead())) {
                 JOptionPane.showMessageDialog(null, "bike 2 crashed into bike 1. RIP");
-               AudioPlayer.play("/tron/crash.wav");
-           }
+                AudioPlayer.play("/tron/crashsound.mp3");
+                resetGame();
+            }
 
+        }
+   
+    
+    }
+    
 
-
-    }
-    }
-    }
+}

@@ -11,7 +11,8 @@ import static javafx.scene.paint.Color.color;
 public class Barrier {
 
     Barrier(int i, int i0, Color GREEN, Arena aThis) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+    
     }
 
     public void draw(Graphics graphics) {
