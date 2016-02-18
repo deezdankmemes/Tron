@@ -10,5 +10,5 @@ package tron;
  * @author NathanielWard
  */
 public enum GameState {
-    STOPPED, RUNNING
+    STOPPED, RUNNING, CRASHED, PAUSED
 }

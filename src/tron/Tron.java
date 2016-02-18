@@ -6,6 +6,7 @@
 package tron;
 
 import environment.ApplicationStarter;
+import java.awt.Dimension;
 
 /**
  *
@@ -17,7 +18,7 @@ public class Tron {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        ApplicationStarter.run("Tron", new Arena());
+        ApplicationStarter.run(new String[0], "Tron", new Dimension(788,800), new Arena());
 
     }
 

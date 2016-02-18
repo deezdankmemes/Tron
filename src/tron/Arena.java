@@ -10,6 +10,7 @@ import environment.Environment;
 import grid.Grid;
 import images.ResourceTools;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
@@ -22,35 +23,38 @@ import javax.swing.JOptionPane;
  *
  * @author NathanielWard
  */
-class Arena extends Environment {
+class Arena extends Environment implements MoveValidatorIntf {
 
     private Grid grid;
     private Bike bike1;
     private Bike bike2;
     private GameState state = GameState.STOPPED;
+    private MySoundManager soundManager;
+
+//    private Barriers barriers;
     int counter;
 
     public Arena() {
+        this.state = GameState.CRASHED;
         this.setBackground(ResourceTools.loadImageFromResource("tron/SZdhPUH.jpg").getScaledInstance(1000, 750, Image.SCALE_SMOOTH));
 
-        grid = new Grid(145, 145, 5, 5, new Point(30, 30), new Color(0, 0, 250));
+        grid = new Grid(145, 140, 5, 5, new Point(30, 30), new Color(0, 0, 250));
 
-//        bike1 = new Bike(Direction.RIGHT, new Point(22, 22), Color.GREEN, grid);
-//        bike2 = new Bike(Direction.DOWN, new Point(44, 44), Color.RED, grid);
+        soundManager = MySoundManager.getSoundManager();
+
         resetGame();
     }
 
     private void resetGame() {
         // remove tail on the bikes
         // put the bikes in a new start position
-        
-        
-        bike1 = new Bike(Direction.LEFT, new Point(128, 50), Color.GREEN, grid);
-        bike2 = new Bike(Direction.RIGHT, new Point(18, 50), Color.RED, grid);
-         
+
+        bike1 = new Bike(Direction.LEFT, new Point(128, 70), Color.GREEN, grid, this);
+        bike2 = new Bike(Direction.RIGHT, new Point(18, 70), Color.RED, grid, this);
+
         // set the gamestate to STOPPED
-        state = GameState.STOPPED;
-         
+        setState(GameState.STOPPED);
+
 // play a cool
     }
 
@@ -61,12 +65,14 @@ class Arena extends Environment {
     @Override
     public void timerTaskHandler() {
         if (state == GameState.RUNNING) {
+
             if (bike1 != null) {
                 bike1.move();
             }
             if (bike2 != null) {
                 bike2.move();
             }
+
             checkCollisions();
         }
     }
@@ -95,9 +101,13 @@ class Arena extends Environment {
             bike2.setDirection(Direction.DOWN);
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             if (state == GameState.RUNNING) {
-                state = GameState.STOPPED;
-            } else {
-                state = GameState.RUNNING;
+                setState(GameState.STOPPED);
+//               state = GameState.PAUSED;
+
+            } else if (state == GameState.STOPPED) {
+                setState(GameState.RUNNING);
+                System.out.println("running");
+
             }
         }
 
@@ -113,10 +123,12 @@ class Arena extends Environment {
 
     @Override
     public void paintEnvironment(Graphics graphics) {
-        if (grid != null) {
-            grid.paintComponent(graphics);
-
+        if ((state == GameState.RUNNING) || ((state == GameState.STOPPED))) {
+            if (grid != null) {
+                grid.paintComponent(graphics);
+            }
         }
+        
         if (bike1 != null) {
             bike1.draw(graphics);
         }
@@ -124,41 +136,108 @@ class Arena extends Environment {
         if (bike2 != null) {
             bike2.draw(graphics);
         }
+        graphics.setColor(Color.green);
+        graphics.drawString("PLAYER 1", 650, 20);
+        graphics.setColor(Color.red);
+        graphics.drawString("PLAYER 2", 70, 20);
+
+        if (state == GameState.STOPPED) {
+            graphics.setColor(new Color(0, 0, 0, 200));
+            graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
+
+            graphics.setFont(new Font("Arial", Font.BOLD, 60));
+            graphics.setColor(Color.red);
+            graphics.drawString("PAUSED", 288, 350);
+
+        }
+
     }
 
     public void checkCollisions() {
         if ((bike1 != null) && (bike2 != null)) {
             if (bike1.selfHit()) {
-                state = GameState.STOPPED;
-                JOptionPane.showMessageDialog(null, "bike 1 crashed into itself. RIP");
+                setState(GameState.STOPPED);
+
+                //JOptionPane.showMessageDialog(null, "bike 1 crashed into itself. RIP");
                 // System.out.println("bike 1 self hit....");
-                AudioPlayer.play("/tron/crashsound.mp3");
+//                AudioPlayer.play("/tron/crashsound.mp3");
                 resetGame();
             }
             if (bike2.selfHit()) {
                 JOptionPane.showMessageDialog(null, "bike 2 crashed into itself. RIP");
                 //System.out.println("bike 2 self hit....");
-                AudioPlayer.play("/tron/crashsound.mp3");
+//                AudioPlayer.play("/tron/.mp3");
                 resetGame();
             }
 
             if (bike2.hasBeenHit(bike1.getHead())) {
                 JOptionPane.showMessageDialog(null, "bike 1 crashed into bike 2. RIP");
-                //System.out.println("bike 2 has been hit...");
-                AudioPlayer.play("/tron/crashsound.mp3");
+
+//                AudioPlayer.play("/tron/crashsound.mp3");
                 resetGame();
             }
 
             if (bike1.hasBeenHit(bike2.getHead())) {
                 JOptionPane.showMessageDialog(null, "bike 2 crashed into bike 1. RIP");
-                AudioPlayer.play("/tron/crashsound.mp3");
+//                AudioPlayer.play("/tron/crashsound.mp3");
                 resetGame();
             }
 
         }
-   
-    
-    }
-    
 
+    }
+
+//    private static class Barriers {
+//
+//        public Barriers() {
+//           if (barriers != null) {
+//           for (Barrier barrier : barriers.getBarriers()) {
+//               if (barrier.getLocation().equals(bike1.getHead())) {
+//                   JB.addHealth(-1000);
+//                   System.out.println("Game Over");
+//               }
+//
+//               if (barrier.getLocation().equals(JB2.getHead())) {
+//                   JB2.addHealth(-1000);
+//                   System.out.println("Game Over");
+//               } 
+//        }
+//    }
+//    
+//<editor-fold defaultstate="collapsed" desc="MoveValidatorIntf">
+    @Override
+    public Point validate(Point proposedLocation) {
+        //assess and adjust the proposedLocation
+
+        if (proposedLocation.x < 0) {
+            setState(GameState.STOPPED);
+        } else if (proposedLocation.x >= grid.getColumns()) {
+            resetGame();
+        }
+        if (proposedLocation.y < 0) {
+            resetGame();
+        } else if (proposedLocation.y >= grid.getRows()) {
+            resetGame();
+        }
+        return proposedLocation;
+    }
+//</editor-fold>
+
+    /**
+     * @param state the state to set
+     */
+    public void setState(GameState state) {
+        this.state = state;
+        
+        //if ((state == GameState.RUNNING) || ((state == GameState.STOPPED))) {
+        if (state == GameState.RUNNING) {
+            soundManager.play(MySoundManager.DANKKAZOO);
+            System.out.println("playing");
+
+        }
+        if (state == GameState.STOPPED) {
+            soundManager.stop(MySoundManager.DANKKAZOO);
+            System.out.println("not playing");
+        }
+    }
 }

@@ -20,13 +20,15 @@ public class Bike {
     //moves to fast
     //no colissions
 
-    public Bike(Direction direction, Point startLocation, Color color, Grid grid) {
+    public Bike(Direction direction, Point startLocation, Color color, Grid grid, MoveValidatorIntf moveValidator) {
         this.direction = direction;
         this.grid = grid;
         this.bodyColor = color;
 
         body = new ArrayList<>();
         body.add(startLocation);
+        
+        this.moveValidator = moveValidator;
     }
 
     public void draw(Graphics graphics) {
@@ -53,8 +55,9 @@ public class Bike {
             newHead.y--;
         }
 
-        body.add(HEAD_POSITION, newHead);
+        body.add(HEAD_POSITION, moveValidator.validate(newHead));
     }
+    
     private static int HEAD_POSITION = 0;
 
     public Point getHead() {
@@ -72,6 +75,7 @@ public class Bike {
     
    //<editor-fold defaultstate="collapsed" desc="properties">
 
+    private final MoveValidatorIntf moveValidator;
     private Direction direction = Direction.LEFT;
     private ArrayList<Point> body;
     private Grid grid;

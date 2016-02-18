@@ -2,6 +2,7 @@ package tron;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
 import static javafx.scene.paint.Color.color;
 
 /**
@@ -10,98 +11,88 @@ import static javafx.scene.paint.Color.color;
  */
 public class Barrier {
 
-    Barrier(int i, int i0, Color GREEN, Arena aThis) {
+   public void draw(Graphics graphics) {
+       graphics.setColor(getColor());
+       graphics.fill3DRect(CellData.getSystemCoordX(getX(), getY()),
+               CellData.getSystemCoordY(getX(), getY()),
+               CellData.getCellWidth(),
+               CellData.getCellhight(),
+               true);
+   }
 
-    
-    }
+   public Barrier(int x, int y, Color color, CellDataProviderIntf cellData, boolean breakable) {
+       this.x = x;
+       this.y = y;
 
-    public void draw(Graphics graphics) {
-        graphics.setColor(color);
-        graphics.fill3DRect(cellData.getSystemCoordX(x, y), cellData.getSystemCoordY(x, y), cellData.getCellWidth(), cellData.getCellHeight(), true);
-    }
+       this.color = color;
+       this.CellData = cellData;
+       this.breakable = breakable;
 
-    public Barrier(int x, int y, Color color, boolean breakable, CellDataProviderIntf cellData) {
-        this.x = x;
-        this.y = y;
-        this.color = color;
-        this.breakable = breakable;
-        this.cellData = cellData;
-    }
+   }
 
-//<editor-fold defaultstate="collapsed" desc="Properties">
-    private int x, y;
-    private Color color;
-    private boolean breakable = false;
-    private CellDataProviderIntf cellData;
+   private int x, y;
+   private Color color;
+   private boolean breakable = false;
+   private CellDataProviderIntf CellData;
 
-    /**
-     * @return the x
-     */
-    public int getX() {
-        return x;
-    }
+   public Point getLocation() {
+       return new Point(x, y);
+   }
 
-    /**
-     * @param x the x to set
-     */
-    public void setX(int x) {
-        this.x = x;
-    }
+   /**
+    * @return the x
+    */
+   public int getX() {
+       return x;
+   }
 
-    /**
-     * @return the y
-     */
-    public int getY() {
-        return y;
-    }
+   /**
+    * @param x the x to set
+    */
+   public void setX(int x) {
+       this.x = x;
+   }
 
-    /**
-     * @param y the y to set
-     */
-    public void setY(int y) {
-        this.y = y;
-    }
+   /**
+    * @return the y
+    */
+   public int getY() {
+       return y;
+   }
 
-    /**
-     * @return the Color
-     */
-    public Color getColor() {
-        return color;
-    }
+   /**
+    * @param y the y to set
+    */
+   public void setY(int y) {
+       this.y = y;
+   }
 
-    /**
-     * @param Color the Color to set
-     */
-    public void setColor(Color Color) {
-        this.color = Color;
-    }
+   /**
+    * @return the color
+    */
+   public Color getColor() {
+       return color;
+   }
 
-    /**
-     * @return the breakable
-     */
-    public boolean isBreakable() {
-        return breakable;
-    }
+   /**
+    * @param color the color to set
+    */
+   public void setColor(Color color) {
+       this.color = color;
+   }
 
-    /**
-     * @param breakable the breakable to set
-     */
-    public void setBreakable(boolean breakable) {
-        this.breakable = breakable;
-    }
+   /**
+    * @return the breakable
+    */
+   public boolean isBreakable() {
+       return breakable;
+   }
 
-    /**
-     * @return the cellData
-     */
-    public CellDataProviderIntf getCellData() {
-        return cellData;
-    }
+   /**
+    * @param breakable the breakable to set
+    */
+   public void setBreakable(boolean breakable) {
+       this.breakable = breakable;
+   }
 
-    /**
-     * @param cellData the cellData to set
-     */
-    public void setCellData(CellDataProviderIntf cellData) {
-        this.cellData = cellData;
-    }
-//</editor-fold>
 }

@@ -14,4 +14,6 @@ public interface CellDataProviderIntf {
     public int getCellHeight();
     public int getSystemCoordY(int x, int y);
     public int getSystemCoordX(int x, int y);
+
+    public int getCellhight();
 }
