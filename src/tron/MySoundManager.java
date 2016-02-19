@@ -20,7 +20,8 @@ public class MySoundManager extends SoundManager {
     public static MySoundManager getSoundManager() {
         ArrayList<Track> tracks = new ArrayList<>();
 
-        tracks.add(new Track(MySoundManager.DANKKAZOO, Source.RESOURCE, "/tron/dankkazoo.wav"));
+        tracks.add(new Track(MySoundManager.DANKKAZOO, Source.RESOURCE, "/tron/takeoff.wav"));
+        tracks.add(new Track(MySoundManager.LANDING, Source.RESOURCE, "/tron/landing.wav"));
         Playlist playlist = new Playlist(tracks);
         return new MySoundManager(playlist);
     }
@@ -30,5 +31,5 @@ public class MySoundManager extends SoundManager {
     }
 
     public static final String DANKKAZOO = "KAZOO";
-
+public static final String LANDING = "LAND";
 }

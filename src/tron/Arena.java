@@ -30,6 +30,7 @@ class Arena extends Environment implements MoveValidatorIntf {
     private Bike bike2;
     private GameState state = GameState.STOPPED;
     private MySoundManager soundManager;
+    private String deathMessage;
 
 //    private Barriers barriers;
     int counter;
@@ -64,6 +65,7 @@ class Arena extends Environment implements MoveValidatorIntf {
 
     @Override
     public void timerTaskHandler() {
+        System.out.println(state);
         if (state == GameState.RUNNING) {
 
             if (bike1 != null) {
@@ -82,22 +84,22 @@ class Arena extends Environment implements MoveValidatorIntf {
 
         //System.out.println("key press" + e.getKeyChar());
         // System.out.println("key press" + e.getKeyCode());
-        if (e.getKeyCode() == KeyEvent.VK_UP) {
+        if (e.getKeyCode() == KeyEvent.VK_UP && bike1.getDirection() != Direction.DOWN) {
             bike1.setDirection(Direction.UP);
-        } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+        } else if (e.getKeyCode() == KeyEvent.VK_RIGHT && bike1.getDirection() != Direction.LEFT) {
             bike1.setDirection(Direction.RIGHT);
-        } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+        } else if (e.getKeyCode() == KeyEvent.VK_LEFT && bike1.getDirection() != Direction.RIGHT) {
             bike1.setDirection(Direction.LEFT);
-        } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+        } else if (e.getKeyCode() == KeyEvent.VK_DOWN && bike1.getDirection() != Direction.UP) {
             bike1.setDirection(Direction.DOWN);
         }
-        if (e.getKeyCode() == KeyEvent.VK_W) {
+        if (e.getKeyCode() == KeyEvent.VK_W && bike2.getDirection() != Direction.DOWN) {
             bike2.setDirection(Direction.UP);
-        } else if (e.getKeyCode() == KeyEvent.VK_D) {
+        }  if (e.getKeyCode() == KeyEvent.VK_D && bike2.getDirection() != Direction.LEFT) {
             bike2.setDirection(Direction.RIGHT);
-        } else if (e.getKeyCode() == KeyEvent.VK_A) {
+        }  if (e.getKeyCode() == KeyEvent.VK_A && bike2.getDirection() != Direction.RIGHT) {
             bike2.setDirection(Direction.LEFT);
-        } else if (e.getKeyCode() == KeyEvent.VK_S) {
+        } else if (e.getKeyCode() == KeyEvent.VK_S && bike2.getDirection() != Direction.UP) {
             bike2.setDirection(Direction.DOWN);
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             if (state == GameState.RUNNING) {
@@ -106,7 +108,10 @@ class Arena extends Environment implements MoveValidatorIntf {
 
             } else if (state == GameState.STOPPED) {
                 setState(GameState.RUNNING);
+                deathMessage = null;
                 System.out.println("running");
+                bike1.setDirection(Direction.LEFT);
+                bike2.setDirection(Direction.RIGHT);
 
             }
         }
@@ -124,11 +129,12 @@ class Arena extends Environment implements MoveValidatorIntf {
     @Override
     public void paintEnvironment(Graphics graphics) {
         if ((state == GameState.RUNNING) || ((state == GameState.STOPPED))) {
+            
             if (grid != null) {
                 grid.paintComponent(graphics);
             }
         }
-        
+
         if (bike1 != null) {
             bike1.draw(graphics);
         }
@@ -137,9 +143,9 @@ class Arena extends Environment implements MoveValidatorIntf {
             bike2.draw(graphics);
         }
         graphics.setColor(Color.green);
-        graphics.drawString("PLAYER 1", 650, 20);
+        graphics.drawString("BIKE 1", 650, 20);
         graphics.setColor(Color.red);
-        graphics.drawString("PLAYER 2", 70, 20);
+        graphics.drawString("BIKE 2", 70, 20);
 
         if (state == GameState.STOPPED) {
             graphics.setColor(new Color(0, 0, 0, 200));
@@ -148,8 +154,17 @@ class Arena extends Environment implements MoveValidatorIntf {
             graphics.setFont(new Font("Arial", Font.BOLD, 60));
             graphics.setColor(Color.red);
             graphics.drawString("PAUSED", 288, 350);
-
+            graphics.setFont(new Font("Arial", Font.BOLD, 25));
+            if (deathMessage != null) graphics.drawString(deathMessage, 240, 275);
         }
+        
+    
+        
+           
+            
+            
+                    
+        
 
     }
 
@@ -158,28 +173,31 @@ class Arena extends Environment implements MoveValidatorIntf {
             if (bike1.selfHit()) {
                 setState(GameState.STOPPED);
 
-                //JOptionPane.showMessageDialog(null, "bike 1 crashed into itself. RIP");
+//                JOptionPane.showMessageDialog(null, "bike 1 crashed into itself. RIP");
+                deathMessage = "Green crashed into itself. RIP";
                 // System.out.println("bike 1 self hit....");
 //                AudioPlayer.play("/tron/crashsound.mp3");
                 resetGame();
             }
             if (bike2.selfHit()) {
-                JOptionPane.showMessageDialog(null, "bike 2 crashed into itself. RIP");
+                //JOptionPane.showMessageDialog(null, "bike 2 crashed into itself. RIP");
+                deathMessage = "Red crashed into itself. RIP";
                 //System.out.println("bike 2 self hit....");
 //                AudioPlayer.play("/tron/.mp3");
                 resetGame();
             }
 
             if (bike2.hasBeenHit(bike1.getHead())) {
-                JOptionPane.showMessageDialog(null, "bike 1 crashed into bike 2. RIP");
-
+                //JOptionPane.showMessageDialog(null, "bike 1 crashed into bike 2. RIP");
+                deathMessage = "Green crashed into bike 2. RIP";
 //                AudioPlayer.play("/tron/crashsound.mp3");
                 resetGame();
             }
 
             if (bike1.hasBeenHit(bike2.getHead())) {
-                JOptionPane.showMessageDialog(null, "bike 2 crashed into bike 1. RIP");
-//                AudioPlayer.play("/tron/crashsound.mp3");
+                // JOptionPane.showMessageDialog(null, "bike 2 crashed into bike 1. RIP");
+                deathMessage ="Red crashed into bike 1. RIP";
+                //AudioPlayer.play("/tron/crashsound.mp3");
                 resetGame();
             }
 
@@ -228,7 +246,7 @@ class Arena extends Environment implements MoveValidatorIntf {
      */
     public void setState(GameState state) {
         this.state = state;
-        
+
         //if ((state == GameState.RUNNING) || ((state == GameState.STOPPED))) {
         if (state == GameState.RUNNING) {
             soundManager.play(MySoundManager.DANKKAZOO);
@@ -236,7 +254,7 @@ class Arena extends Environment implements MoveValidatorIntf {
 
         }
         if (state == GameState.STOPPED) {
-            soundManager.stop(MySoundManager.DANKKAZOO);
+            soundManager.play(MySoundManager.LANDING);
             System.out.println("not playing");
         }
     }
